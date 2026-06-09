@@ -1,0 +1,92 @@
+@import url("https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&f[]=general-sans@400,500,600&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --space: #0b0717;
+}
+
+* {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+html {
+  background: var(--space);
+}
+
+body {
+  /* Transparent so the fixed -z-10 Signals canvas shows through.
+     In-flow backgrounds paint above negative-z elements, so an opaque
+     body/main here would hide the canvas. html keeps the base color. */
+  background: transparent;
+  color: #ece8f5;
+  font-family: "General Sans", system-ui, sans-serif;
+  overflow-x: hidden;
+}
+
+::selection {
+  background: #f5b544;
+  color: #0b0717;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: #0b0717;
+}
+::-webkit-scrollbar-thumb {
+  background: #2a1f4d;
+  border-radius: 8px;
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-rise {
+  opacity: 0;
+  animation: rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes drift-slow {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(8%, 6%) scale(1.12);
+  }
+}
+@keyframes drift-slower {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(-7%, -5%) scale(1.08);
+  }
+}
+.animate-drift-slow {
+  animation: drift-slow 22s ease-in-out infinite;
+}
+.animate-drift-slower {
+  animation: drift-slower 28s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
