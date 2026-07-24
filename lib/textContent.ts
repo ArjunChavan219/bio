@@ -1,7 +1,11 @@
 /**
- * Flattens the full content model into plain text lines per section.
- * Used by Vim and k9s modes, which present the *complete* journey as monospace
- * text — school, college, masters, both jobs, projects, certs, awards, scores.
+ * Flattens the full content model into Markdown, one array of lines per section.
+ *
+ * Vim and k9s modes present the *complete* journey — school, college, master's,
+ * both jobs, every project, certs, awards, scores, the long origin story — and
+ * both can show it two ways: the raw Markdown source, or the rendered version
+ * (see components/Markdown.tsx). So these lines have to be real Markdown, not
+ * pre-indented ASCII: headings, bullets, `**bold**`, `` `code` ``, [links](url).
  */
 
 import {
@@ -25,16 +29,22 @@ export interface TextSection {
 
 const wrapProject = (p: (typeof projects)[number]): string[] => {
   const base = [
-    `# ${p.title}  ·  ${p.year}  ·  [${p.tags.join(", ")}]`,
-    `  ${p.summary}`,
-    `  problem:   ${p.problem}`,
-    `  built:     ${p.whatYouBuilt}`,
-    `  decisions: ${p.keyDecisions}`,
-    `  shows:     ${p.whatItShows}`,
+    `## ${p.title}`,
+    `\`${p.year}\` · \`${p.category}\` · ${p.tags.map((t) => `\`${t}\``).join(" ")}`,
+    "",
+    p.summary,
+    "",
+    `**Problem** — ${p.problem}`,
+    "",
+    `**Built** — ${p.whatYouBuilt}`,
+    "",
+    `**Decisions** — ${p.keyDecisions}`,
+    "",
+    `**Shows** — ${p.whatItShows}`,
   ];
-  if (p.stack) base.push(`  stack:     ${p.stack.join(", ")}`);
-  if (p.links) base.push(`  links:     ${p.links.map((l) => `${l.label} <${l.href}>`).join("  ")}`);
-  base.push("");
+  if (p.stack) base.push("", `**Stack:** ${p.stack.join(", ")}`);
+  if (p.links) base.push("", `**Links:** ${p.links.map((l) => `[${l.label}](${l.href})`).join(" · ")}`);
+  base.push("", "---", "");
   return base;
 };
 
@@ -43,39 +53,51 @@ export const textSections: TextSection[] = [
     id: "experience",
     label: "experience",
     meta: `${experience.length} companies`,
-    lines: experience.flatMap((e) => [
-      `# ${e.company} — ${e.location}`,
-      ...e.roles.map((r) => `  ${r.title.padEnd(28)} ${r.period}`),
+    lines: [
+      "# Experience",
       "",
-      `  ${e.summary}`,
-      "",
-      "  ## Highlights",
-      ...e.highlights.map((h) => `  - ${h}`),
-      "",
-      "  ## Recognition",
-      ...e.accolades.map((a) => `  ★ ${a}`),
-      "",
-      `  stack: ${e.stack.join(", ")}`,
-      "",
-      "",
-    ]),
+      ...experience.flatMap((e) => [
+        `## ${e.company}`,
+        `\`${e.location}\``,
+        "",
+        ...e.roles.map((r) => `**${r.title}** · ${r.period}`),
+        "",
+        e.summary,
+        "",
+        "### Highlights",
+        ...e.highlights.map((h) => `- ${h}`),
+        "",
+        "### Recognition",
+        ...e.accolades.map((a) => `- ★ ${a}`),
+        "",
+        `**Stack:** ${e.stack.join(", ")}`,
+        "",
+        "---",
+        "",
+      ]),
+    ],
   },
   {
     id: "projects",
     label: "projects",
     meta: `${projects.length} projects`,
-    lines: projects.flatMap(wrapProject),
+    lines: ["# Projects", "", ...projects.flatMap(wrapProject)],
   },
   {
     id: "education",
     label: "education",
     meta: `${education.length} programs`,
-    lines: education.flatMap((ed) => [
-      `# ${ed.degree} — ${ed.school}  (${ed.period})`,
-      `  ${ed.detail}`,
-      ...ed.notes.map((n) => `  - ${n}`),
+    lines: [
+      "# Education",
       "",
-    ]),
+      ...education.flatMap((ed) => [
+        `## ${ed.degree}`,
+        `**${ed.school}** · ${ed.detail} · \`${ed.period}\``,
+        "",
+        ...ed.notes.map((n) => `- ${n}`),
+        "",
+      ]),
+    ],
   },
   {
     id: "certifications",
@@ -84,26 +106,45 @@ export const textSections: TextSection[] = [
     lines: [
       "# Certifications & Courses",
       "",
-      ...certifications.map((c) => `  ${c.date.padEnd(10)} ${c.name}  —  ${c.issuer}`),
+      ...certifications.map((c) => `- \`${c.date}\` **${c.name}** — ${c.issuer}`),
     ],
   },
   {
     id: "awards",
     label: "awards",
     meta: `${awards.length} awards`,
-    lines: ["# Awards & Recognition", "", ...awards.map((a) => `  ${a.year}   ${a.text}`)],
+    lines: ["# Awards & Recognition", "", ...awards.map((a) => `- \`${a.year}\` ${a.text}`)],
   },
   {
     id: "scores",
     label: "scores",
     meta: "GRE · TOEFL",
-    lines: ["# Test Scores", "", ...scores.flatMap((s) => [`  ${s.test.padEnd(10)} ${s.result}`, `             ${s.detail}`, ""])],
+    lines: [
+      "# Test Scores",
+      "",
+      ...scores.flatMap((s) => [`## ${s.test} — ${s.result}`, s.detail, ""]),
+    ],
   },
   {
     id: "origin",
     label: "origin",
-    meta: "Where it started",
-    lines: ["# Origin", "", `  ${origin.blurb}`, "", ...origin.lines.map((l) => `  - ${l}`)],
+    meta: `${origin.chapters.length} chapters`,
+    lines: [
+      "# Origin",
+      "",
+      `> ${origin.blurb}`,
+      "",
+      "---",
+      "",
+      ...origin.chapters.flatMap((c) => [
+        `## ${c.title}`,
+        ...(c.period ? [`\`${c.period}\``, ""] : [""]),
+        ...c.paragraphs.flatMap((p) => [p, ""]),
+        ...(c.bullets ? [...c.bullets.map((b) => `- ${b}`), ""] : []),
+        "---",
+        "",
+      ]),
+    ],
   },
   {
     id: "about",
@@ -118,11 +159,11 @@ export const textSections: TextSection[] = [
     lines: [
       "# Contact",
       "",
-      `  email:    ${profile.links.email}`,
-      `  linkedin: ${profile.links.linkedin}`,
-      `  github:   ${profile.links.github}`,
-      `  resume:   ${profile.links.resume}`,
-      `  location: ${profile.location}`,
+      `- **Email** — [${profile.links.email}](mailto:${profile.links.email})`,
+      `- **LinkedIn** — [${profile.links.linkedinLabel}](${profile.links.linkedin})`,
+      `- **GitHub** — [${profile.links.githubLabel}](${profile.links.github})`,
+      `- **Resume** — [download PDF](${profile.links.resume})`,
+      `- **Location** — ${profile.location}`,
     ],
   },
 ];

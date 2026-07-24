@@ -27,8 +27,8 @@ export default function ProjectPage({ params }: { params: { slug: string } }) {
   return (
     <main className="relative min-h-screen bg-space text-ink">
       <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden bg-space">
-        <div className="absolute -left-40 -top-40 h-[55vh] w-[55vh] rounded-full bg-vsignal/15 blur-[120px]" />
-        <div className="absolute -right-40 top-1/2 h-[50vh] w-[50vh] rounded-full bg-asignal/10 blur-[130px]" />
+        <div className="absolute -left-40 -top-40 h-[55vh] w-[55vh] rounded-full bg-perp/10 blur-[120px]" />
+        <div className="absolute -right-40 top-1/2 h-[50vh] w-[50vh] rounded-full bg-victim/10 blur-[130px]" />
       </div>
 
       <nav className="flex items-center justify-between px-6 py-5 sm:px-10">
@@ -56,7 +56,7 @@ export default function ProjectPage({ params }: { params: { slug: string } }) {
         {p.stack && (
           <div className="mt-8 flex flex-wrap gap-2">
             {p.stack.map((s) => (
-              <span key={s} className="border border-vsignal/30 px-2 py-1 font-mono text-[11px] text-muted">
+              <span key={s} className="border border-ink/15 px-2 py-1 font-mono text-[11px] text-muted">
                 {s}
               </span>
             ))}
@@ -98,7 +98,7 @@ export default function ProjectPage({ params }: { params: { slug: string } }) {
             </section>
           )}
 
-          <section className="border-t border-asignal/20 pt-6">
+          <section className="border-t border-ink/10 pt-6">
             <p className="italic leading-[1.8] text-muted">{p.whatItShows}</p>
           </section>
         </div>

@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <!-- Editorial monogram: a slab-serif "A" with a live node at the apex —
+       the two halves of the site's identity (serif statement + system topology)
+       in one mark. Next App Router serves app/icon.svg and injects the
+       <link rel="icon"> itself, basePath-aware. -->
+  <rect width="32" height="32" fill="#08090C"/>
+  <g fill="none" stroke="#ECF0F8" stroke-linecap="butt">
+    <!-- legs + crossbar -->
+    <path d="M7.5 25.5 16 7 24.5 25.5" stroke-width="3.2"/>
+    <path d="M11.6 19.4h8.8" stroke-width="2.6"/>
+    <!-- slab feet -->
+    <path d="M4.6 25.8h6.6M20.8 25.8h6.6" stroke-width="2.6"/>
+  </g>
+  <circle cx="16" cy="7" r="2.9" fill="#E23B3B"/>
+</svg>

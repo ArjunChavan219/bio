@@ -5,6 +5,8 @@
  * Content never forks across the three presentations.
  */
 
+import { asset } from "./asset";
+
 export const profile = {
   name: "Arjun Chavan",
   title: "Software Engineer",
@@ -25,7 +27,8 @@ export const profile = {
     linkedinLabel: "arjun-chavan-9936041a6",
     github: "https://github.com/ArjunChavan219",
     githubLabel: "ArjunChavan219",
-    resume: "/resume.pdf",
+    // public/ asset reached by a plain <a> — must carry the basePath itself.
+    resume: asset("/resume.pdf"),
   },
 } as const;
 
@@ -393,16 +396,179 @@ export const scores: Score[] = [
 
 /* --------------------------------- Origin -------------------------------- */
 
+export interface OriginChapter {
+  id: string;
+  title: string;
+  period?: string;
+  paragraphs: string[];
+  bullets?: string[];
+}
+
+/**
+ * The long version — Mumbai to Tysons, in order. This is deliberately *not*
+ * curated the way Visual mode is: it's the full account, and it lives in the
+ * Vim and k9s views for the people who go looking.
+ */
 export const origin = {
   blurb:
-    "I started young and never really stopped — the through-line from a 5th-grader writing his first programs to a senior engineer shipping production AI.",
-  lines: [
-    "Started programming in 5th standard; C++ and Java by 8th (private tutoring).",
-    "UCMAS Abacus (Distinction at all levels) and Vedic Maths.",
-    "International Maths Olympiad rank 446; IPM and Ganit Pradnya merits.",
-    "Music — Classical, Keyboard, Harmonica, Tanpura (grades 4–8).",
-    "Sports — swimming, gymnastics, lawn tennis, skating.",
-  ],
+    "The through-line from a fifth-grader writing his first programs on a family computer in Mumbai to an engineer shipping production AI in Virginia. It is one long habit, not a career plan.",
+  chapters: [
+    {
+      id: "first-machine",
+      title: "The first machine",
+      period: "School · Mumbai",
+      paragraphs: [
+        "I wrote my first program in 5th standard, before I had any idea it was a profession. The computer was the most interesting object in the house and everything I learned about it was in service of making it do something it hadn't done before.",
+        "It went in the order that curiosity goes, not the order a syllabus would pick: Flash animation in 6th, Photoshop in 7th, then C++ and Java by 8th with a private tutor because school had run out of things to teach me on the subject. By the time I got to engineering college I had already been writing code for half my life.",
+      ],
+      bullets: [
+        "First programs in 5th standard.",
+        "Flash animation in 6th, Photoshop in 7th.",
+        "C++ and Java by 8th standard, through private tutoring.",
+      ],
+    },
+    {
+      id: "arithmetic",
+      title: "Arithmetic before algorithms",
+      period: "School · Mumbai",
+      paragraphs: [
+        "In parallel — and this is the part that actually shaped how I think — I trained in mental arithmetic. UCMAS abacus with a Distinction at every level, then Vedic Maths. Years of drilling numbers until the answer arrives before the method does.",
+        "What it left behind wasn't arithmetic. It was the expectation that a hard thing becomes an automatic thing if you sit with it long enough, and an instinct for finding the shorter path through a calculation. I reach for that instinct constantly — in optimization work, in cost/latency trade-offs, in the moment where a system's structure suddenly simplifies.",
+      ],
+      bullets: [
+        "UCMAS Abacus — Distinction at all levels.",
+        "Vedic Maths.",
+        "International Maths Olympiad — rank 446.",
+        "IPM and Ganit Pradnya merit awards.",
+      ],
+    },
+    {
+      id: "practice",
+      title: "Practice as a default setting",
+      period: "School · Mumbai",
+      paragraphs: [
+        "Music and sport ran alongside all of it. Indian classical, keyboard, harmonica and tanpura, graded 4th through 8th. Swimming, gymnastics, lawn tennis, skating.",
+        "None of it was for a résumé — it was simply how the days were spent. But it built the thing every one of those disciplines has in common with engineering: you are bad at it, you keep going, and one day the mechanics disappear and you are just doing the thing. I don't experience learning as a special event. It's the normal state.",
+      ],
+      bullets: [
+        "Music — Indian classical, keyboard, harmonica, tanpura (grades 4–8).",
+        "Sport — swimming, gymnastics, lawn tennis, skating.",
+      ],
+    },
+    {
+      id: "dbit",
+      title: "Engineering school, and everything around it",
+      period: "DBIT, Mumbai University · 2017 – 2021",
+      paragraphs: [
+        "B.E. in Computer Engineering, 3.9/4.0, Best Outgoing Student of the 2017–2021 batch. But the coursework is not what I remember. The competitions are.",
+        "PEGASUS was the big one: an international Can-Sat team building a satellite the size of a soda can that had to survive a launch and fly on its own. I was Head of Software Subsystems and alternate team lead — flight-controller and microcontroller firmware across Pixhawk, Arduino, Teensy and Raspberry Pi, plus circuit-board design. We placed 82nd internationally in 2019 and 40th in 2020. It was the first time I built software where a single bug ends the mission and there is no patch release. That standard never left.",
+        "Then the Smart India Hackathon Grand Finale in 2020, on an ISRO problem statement: plan a drone's route given battery limits, refuelling points and real terrain. The insight that won it was refusing to treat it as a shortest-path problem — a shorter route that runs out of battery isn't a route. Reframed as constraint satisfaction, it came out roughly 70% more efficient than greedy routing.",
+        "The final-year project was a hybrid text-and-image compression system — deep-learning models reaching a 300:1 image ratio, and a parallel LZSS+Huffman implementation in CUDA at a 25× speedup. It was accepted for oral presentation at the International Symposium on Grids and Clouds in 2021, which was the first time work of mine was judged by people who had no reason to be kind about it.",
+      ],
+      bullets: [
+        "B.E. Computer Engineering — GPA 3.9/4.0.",
+        "Best Outgoing Student, batch of 2017–2021.",
+        "PEGASUS Can-Sat — Head of Software Subsystems, alternate team lead. AAS International 82nd (2019), 40th (2020).",
+        "Robocon — 43rd nationally (2019).",
+        "Smart India Hackathon Grand Finale 2020 — ISRO drone route planning, ~70% more efficient routes.",
+        "Hybrid compression final-year project — 300:1 image ratio, 25× parallel speedup; ISGC 2021 oral presentation.",
+        "Several inter-college coding competition wins.",
+      ],
+    },
+    {
+      id: "cimpress",
+      title: "What production actually costs",
+      period: "Cimpress, Mumbai · Aug 2021 – Aug 2023",
+      paragraphs: [
+        "My first real job, and the one that turned me from someone who writes software into someone who runs it. I started full-stack — React and Node features shipping to 300K+ users across six product squads, REST APIs carrying 5M+ requests a day — and moved into DevOps, where the consequences live.",
+        "The projects I was handed were mostly things nobody had done before at the company, which meant the work always started with a week of reading. Ctools Client Auditor was my first solo end-to-end project: learn CommerceTools and Jira from scratch, then build and test a credential auditor. CMS Backup Verification was my first Docker and Kubernetes work, shipped as a cronjob. The repository rollback strategy meant going down into Git and CodeCommit internals until I understood exactly what a rollback does to history. There was a CodeArtifact migration investigation that was pure research.",
+        "Then the NA Migration — a time-sensitive, company-wide, multi-team launch. My team lead's note afterwards was about availability and logical deliverability under stress, which is still the compliment I care most about. I was nominated for a PR2 promotion before I left for my master's.",
+        "The habits from those two years are the ones I still work by: infrastructure as code (Terraform standardized across four teams, drift eliminated), CI/CD that cuts deploy time by 90% with zero-downtime releases, test coverage taken from 45% to 82%, and onboarding docs for 25+ services because a system nobody can ramp into is a system with one owner.",
+      ],
+      bullets: [
+        "Full-stack → DevOps across multiple product squads.",
+        "Ctools Client Auditor — first solo end-to-end project (CommerceTools + Jira credential audit).",
+        "CMS Backup Verification — first Docker/Kubernetes work, built as a cronjob.",
+        "Repository rollback strategy — Git and CodeCommit internals.",
+        "AWS CodeArtifact migration investigation.",
+        "NA Migration — company-wide, time-sensitive launch; recognized by the team lead.",
+        "Nominated for PR2 promotion before leaving for the MS.",
+      ],
+    },
+    {
+      id: "jhu",
+      title: "Baltimore",
+      period: "Johns Hopkins University · Aug 2023 – Dec 2024",
+      paragraphs: [
+        "I moved from Mumbai to Baltimore for an M.S. in Computer Science and finished it in 16 months by loading extra credits, at a 3.9/4.0. Going early was deliberate: I had two years of production experience and wanted the degree to be a sharpening step, not a pause.",
+        "I chose the project-heavy path over the theory-heavy one — Software System Design, Cloud Computing, Neural Networks, Artificial Intelligence, Deep Learning — and spent three semesters as a Course Assistant, for AI in Spring and Fall 2024 and Deep Learning in Fall 2024. Teaching a subject to a room of people who will immediately find the hole in your explanation is the fastest way I know to find out what you only half-understand.",
+        "The summer internship in the middle of it was at Strategy, and it converted to a full-time offer.",
+      ],
+      bullets: [
+        "M.S. Computer Science, GPA 3.9/4.0 — finished in 16 months.",
+        "Course Assistant — Artificial Intelligence (Spring & Fall 2024), Deep Learning (Fall 2024).",
+        "Coursework: Software System Design, Cloud Computing, Neural Networks, AI, Deep Learning.",
+        "Summer 2024 internship at Strategy, converted to full-time.",
+      ],
+    },
+    {
+      id: "strategy",
+      title: "Tysons Corner",
+      period: "Strategy · May 2024 – present",
+      paragraphs: [
+        "I joined as an intern, built the AI assistant inside Autodash 1.0 (50K monthly users) and an AI-driven theme and palette recommendation engine, came back full-time as SWE1 in February 2025, and was promoted to Software Engineer 2 on April 1, 2026.",
+        "The work since has been applied AI at production scale, which is a very different discipline from applied AI in a notebook. I led Autodash 2.0 — a multi-agent workflow for autonomous dashboard creation — from proof of concept to launch, and I own the application-layer orchestration underneath it: multi-provider integration across OpenAI, Groq and Anthropic serving 2M+ queries a day, a dynamic routing layer that cut AI infrastructure cost by roughly $50K a year, and prompt optimization that took 40% of the tokens out while holding 92% of the accuracy.",
+        "One I'm quietly proud of: a functional AI use case prototyped and launched in under three days, formally recognized at Strategy's 2026 Annual Conference. Speed is a design decision, not an accident — it comes from knowing which parts you're allowed to skip.",
+        "Since the promotion the job has widened past the code. Customer-facing AI enablement on enterprise calls covering in-house setup, Kubernetes and Docker, cloud deployment configuration; point of contact for AI on a major enterprise client, with deployments on GKE and Azure containers; and mentoring four incoming engineers — two interns and two new-grad full-timers.",
+      ],
+      bullets: [
+        "Engineering Intern (May–Aug 2024) → SWE1 (Feb 2025) → SWE2 (Apr 1, 2026).",
+        "Autodash 2.0 — multi-agent workflow, PoC to launch.",
+        "LLM orchestration layer — 2M+ queries/day across three providers.",
+        "Multi-provider routing — ~$50K/year infrastructure saved.",
+        "Prompt optimization — 40% fewer tokens at 92% accuracy retained.",
+        "AI use case prototyped and launched in under 3 days — recognized at the 2026 Annual Conference.",
+        "Customer-facing enablement (GKE, Azure containers) and mentoring 4 engineers.",
+      ],
+    },
+    {
+      id: "own-time",
+      title: "What I build when nobody's asking",
+      paragraphs: [
+        "The tell, if you want one, is what gets built on weekends. It is almost always a tool for a problem I actually have, which is why the small ones get finished.",
+        "An expense-splitting app on a Raspberry Pi 4 — React, Flask, PostgreSQL, self-hosted behind Route 53 and CloudFront — built specifically to own every layer from the hardware to the domain. A GRE vocabulary desktop app in Python because drilling vocabulary needed to be frictionless. Market Sentiment RAG: multi-source market-news ingestion, semantic and metadata retrieval over Qdrant, and a self-hosted Qwen model served by vLLM behind an OpenAI-compatible API, so there's no per-token bleed and nothing leaves the system.",
+        "And tailchute, which is open source: a small service that lets me paste a screenshot straight into a Claude Code session running on another machine over Tailscale. It exists because macOS puts screenshots on the clipboard, Taildrop can only send files, and I hit that wall every single day.",
+      ],
+      bullets: [
+        "Expense splitter — self-hosted on a Raspberry Pi 4 with real cloud DNS/CDN.",
+        "GRE vocabulary GUI — Python/Tkinter, built to remove friction from my own studying.",
+        "Market Sentiment RAG — self-hosted vLLM + Qdrant, typed sentiment output.",
+        "tailchute — open source; paste screenshots into a remote Claude Code session over Tailscale.",
+      ],
+    },
+    {
+      id: "how-i-work",
+      title: "How I work",
+      paragraphs: [
+        "I think from the machine's side first — decompose a problem into small modular units, put abstraction layers where the seams are, and make the structure obvious enough that the next person doesn't need me to explain it. Clean code is maintainable code; that isn't an aesthetic position, it's an operational one.",
+        "User experience drives technical decisions, not the other way around — the elegant internal design that produces a worse product is the wrong design. And automation over repetition, always: if I have done something by hand three times, the fourth time is a script.",
+        "What I actually enjoy: optimization, automation, going into an existing system until I understand why it is the way it is and then modernizing it, and debugging. Especially debugging. The bug is the part of the system that is telling you the truth.",
+      ],
+      bullets: [
+        "Clean code is maintainable code.",
+        "User experience drives technical decisions.",
+        "Automation over repetition.",
+        "Decompose into small modular units behind clear abstraction layers.",
+      ],
+    },
+    {
+      id: "next",
+      title: "What's next",
+      paragraphs: [
+        "An early-stage role where I own the full technical stack of an AI product, or a senior IC seat on a team shipping production software at scale. The constant across everything above is that I like being responsible for whether the thing works — end to end, in production, in front of real users.",
+      ],
+    },
+  ] as OriginChapter[],
 } as const;
 
 /* --------------------------------- About --------------------------------- */

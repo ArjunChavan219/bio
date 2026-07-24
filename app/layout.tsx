@@ -3,9 +3,9 @@ import "./globals.css";
 import { ModeProvider } from "@/lib/ModeContext";
 
 export const metadata: Metadata = {
-  title: "Arjun Chavan — Applied AI Engineer",
+  title: "Arjun Chavan — Software Engineer",
   description:
-    "Applied AI engineer building production LLM systems: multi-agent orchestration, retrieval (RAG), and AI infrastructure at scale.",
+    "Software engineer building production backend and AI systems: distributed services, multi-agent orchestration, retrieval (RAG), and LLM infrastructure at scale.",
 };
 
 export default function RootLayout({

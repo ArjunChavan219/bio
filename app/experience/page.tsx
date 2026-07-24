@@ -12,8 +12,8 @@ export default function ExperiencePage() {
     <main className="relative min-h-screen bg-space text-ink">
       {/* Ambient background, matching the home Visual mode */}
       <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden bg-space">
-        <div className="absolute -left-40 -top-40 h-[55vh] w-[55vh] rounded-full bg-vsignal/15 blur-[120px]" />
-        <div className="absolute -right-40 top-1/2 h-[50vh] w-[50vh] rounded-full bg-asignal/10 blur-[130px]" />
+        <div className="absolute -left-40 -top-40 h-[55vh] w-[55vh] rounded-full bg-perp/10 blur-[120px]" />
+        <div className="absolute -right-40 top-1/2 h-[50vh] w-[50vh] rounded-full bg-victim/10 blur-[130px]" />
       </div>
 
       <nav className="flex items-center justify-between px-6 py-5 sm:px-10">
@@ -34,7 +34,7 @@ export default function ExperiencePage() {
 
       <div className="mx-auto max-w-4xl px-6 pb-24 sm:px-10 md:px-16">
         {experience.map((e) => (
-          <section key={e.id} className="border-t border-white/10 py-14">
+          <section key={e.id} className="border-t border-ink/10 py-14">
             <div className="flex flex-col gap-1 md:flex-row md:items-baseline md:justify-between">
               <h2 className="font-display text-3xl font-medium text-ink md:text-4xl">{e.company}</h2>
               <span className="font-mono text-xs uppercase tracking-[0.2em] text-muted">{e.location}</span>
@@ -71,7 +71,7 @@ export default function ExperiencePage() {
 
             <div className="mt-6 flex flex-wrap gap-2">
               {e.stack.map((s) => (
-                <span key={s} className="border border-vsignal/30 px-2 py-1 font-mono text-[11px] text-muted">
+                <span key={s} className="border border-ink/15 px-2 py-1 font-mono text-[11px] text-muted">
                   {s}
                 </span>
               ))}
@@ -79,7 +79,7 @@ export default function ExperiencePage() {
           </section>
         ))}
 
-        <section className="border-t border-white/10 py-14">
+        <section className="border-t border-ink/10 py-14">
           <h2 className="mb-8 font-display text-3xl font-medium text-ink md:text-4xl">Education</h2>
           <div className="space-y-8">
             {education.map((ed) => (
@@ -100,7 +100,7 @@ export default function ExperiencePage() {
           </div>
         </section>
 
-        <section className="border-t border-white/10 py-14">
+        <section className="border-t border-ink/10 py-14">
           <h2 className="mb-8 font-display text-3xl font-medium text-ink md:text-4xl">Awards & Recognition</h2>
           <div className="space-y-4">
             {awards.map((a) => (
@@ -112,7 +112,7 @@ export default function ExperiencePage() {
           </div>
         </section>
 
-        <section className="border-t border-white/10 py-14">
+        <section className="border-t border-ink/10 py-14">
           <h2 className="mb-8 font-display text-3xl font-medium text-ink md:text-4xl">Certifications</h2>
           <div className="grid grid-cols-1 gap-x-8 gap-y-3 sm:grid-cols-2">
             {certifications.map((c) => (
@@ -126,7 +126,7 @@ export default function ExperiencePage() {
           </div>
         </section>
 
-        <div className="border-t border-white/10 pt-10">
+        <div className="border-t border-ink/10 pt-10">
           <Link
             href="/#contact"
             className="inline-block border border-asignal/60 bg-asignal/15 px-6 py-3 font-display text-sm tracking-wide text-asignal transition-all hover:bg-asignal/25"
