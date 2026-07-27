@@ -1,91 +1,99 @@
 # Arjun Chavan — Portfolio
 
-A personal portfolio with three switchable "modes" of the same content:
+**Live:** https://arjunchavan219.github.io/bio/
 
-- **Visual** — the polished GUI portfolio: a scroll-pinned, type-led site with a
-  continuous particle cloud that morphs shape per section (sphere → helix →
-  lattice → wave → ring) and reacts to the cursor.
-- **Vim** — navigate the full résumé like a Vim buffer (`j/k`, `:commands`).
-- **k9s** — browse it like a k9s TUI dashboard (resource table, `:` command bar).
+One résumé, three interfaces. The same content is rendered three ways, and the
+switch between them is the point:
 
-Switch modes with the pill (bottom-right) or press **`m`** in Visual mode.
+- **Visual** — an editorial page: a serif statement, a numbered contents index,
+  and a technical plate per section that draws itself as you arrive.
+- **Vim** — the full résumé as a Vim buffer. `j/k` to move, `:` for commands,
+  `t` toggles raw Markdown against the rendered view. `:colo` opens a real
+  Pmenu-style picker over six published colourschemes (classic, gruvbox,
+  solarized, nord, tokyonight, catppuccin); `j/k` live-previews each one and the
+  choice is remembered per browser.
+- **k9s** — the résumé as a k9s TUI dashboard, using the actual k9s default
+  skin rather than an invented one.
 
-Built with **Next.js 14 (App Router, static export)**, **React**, **Tailwind CSS**,
-and **React Three Fiber / three.js** for the particle background.
+Switch with the pill (bottom-right) or press **`m`**. Quitting either terminal
+(`:q`, `:qa`, `ZZ`, `ZQ`) always lands back on Visual.
+
+Built with **Next.js 14** (App Router, static export), **React**, **TypeScript**,
+and **Tailwind CSS**. No 3D, no WebGL — the visuals are SVG and canvas 2D.
 
 ---
 
-## Run it on another machine
+## Run it locally
 
 ### Prerequisites
 
-- **Node.js ≥ 18.17** (Next.js 14 requirement) — check with `node --version`
-- **pnpm** (this repo uses a `pnpm-lock.yaml`). Install once with either:
-  ```bash
-  corepack enable    # ships with Node 16.10+, no extra install
-  # — or —
-  npm install -g pnpm
-  ```
+- **Node.js ≥ 18.17** — check with `node --version`
+- **pnpm** — `corepack enable` (ships with Node 16.10+) or `npm install -g pnpm`
 
 ### Setup
 
 ```bash
-git clone <repo-url> bio
+git clone https://github.com/ArjunChavan219/bio.git
 cd bio
 pnpm install
-```
-
-### Develop
-
-```bash
 pnpm dev
 ```
 
-Open **http://localhost:3000**. Hot-reload is on; edit and save.
+Open **http://localhost:3000**.
 
-### Production build / static export
+> **Don't run `pnpm build` while `pnpm dev` is running** — it corrupts the
+> `.next` cache. Stop the dev server first, or use `pnpm tsc --noEmit` to
+> typecheck without building.
 
-The site is a fully static export (no server needed to host it).
+### Production build
 
-```bash
-pnpm build        # outputs static files to ./out
-```
-
-Serve `./out/` with any static file server to preview the production build, e.g.:
+The site is a fully static export.
 
 ```bash
-npx serve out
+pnpm build      # → ./out
+npx serve out   # preview
 ```
 
-> **Note:** don't run `pnpm build` while `pnpm dev` is running — it can corrupt
-> the `.next` cache. Stop the dev server first.
+---
 
-### Deploy to GitHub Pages
+## Deploying to GitHub Pages
 
-The repo is configured for GitHub Pages served from `/bio` (see `basePath` in
-`next.config.mjs`). To regenerate the published `docs/` folder:
+> **Read this before deploying.** Pages serves the **root of `main`**, not a
+> `docs/` folder and not the source.
 
-```bash
-pnpm deploy:docs   # builds, adds .nojekyll, and copies out/ → docs/
-```
+- **`feat/portfolio-rebuild`** — the source branch. All development happens here.
+- **`main`** — the published build artifact. Its root *is* the live site.
 
-Then commit `docs/` and point GitHub Pages at the `docs/` folder on your default
-branch.
+To publish: build on the source branch, then copy the contents of `out/` to the
+root of `main` and commit.
+
+Two things that will silently break the deploy:
+
+1. **`.nojekyll` must exist at the root of `main`.** Without it, Jekyll drops
+   every `_next/` directory and the site loads with no CSS or JS.
+2. **`basePath` is `/bio`** (see `next.config.mjs`). Plain `<a href="/x">`
+   anchors are *not* rewritten by Next — they 404 in production while working
+   perfectly on localhost. Use the `lib/asset.ts` helper for static assets.
+
+**Never run `git add -A` on `main`** — it has no `.gitignore`, so it will
+happily commit `node_modules/`.
 
 ---
 
 ## Editing content
 
-All résumé content lives in **one file** — `lib/content.ts` (profile, experience,
-projects, education, certifications, awards, scores, origin, about). Every mode and
-every detail page reads from it, so content never forks. Two derived views:
+All résumé content lives in **one file** — `lib/content.ts` (profile,
+experience, projects, education, certifications, awards, scores, origin,
+about). Every mode and every detail page reads from it, so the content never
+forks. One derived view:
 
-- `lib/textContent.ts` — flattens the model into the text the Vim/k9s modes render.
-- Visual mode shows the curated subset (`featured: true` projects); Vim/k9s show
-  everything.
+- `lib/textContent.ts` — flattens the model into the text the Vim and k9s modes
+  render.
 
-To add a real downloadable résumé, drop a PDF at **`public/resume.pdf`** (the
-"Resume" buttons link to it).
+Visual mode shows the curated subset (`featured: true` projects); Vim and k9s
+show everything.
+
+The downloadable résumé lives at **`public/resume.pdf`**.
 
 ---
 
@@ -94,25 +102,26 @@ To add a real downloadable résumé, drop a PDF at **`public/resume.pdf`** (the
 ```
 app/
   page.tsx              # mode shell (Visual / Vim / k9s)
-  experience/           # dedicated deep experience page
+  experience/           # deep experience page
   projects/[slug]/      # per-project detail pages
+  icon.svg              # favicon
 components/
-  visual/               # Visual mode: hero, sections, particle field, pin stages
-  vim/                  # Vim mode
+  visual/               # editorial sections + self-drawing technical plates
+  vim/                  # Vim mode, colourscheme picker
   k9s/                  # k9s mode
 lib/
-  content.ts            # single source of truth for all content
+  content.ts            # single source of truth
   textContent.ts        # text projection for Vim/k9s
-  ModeContext.tsx       # which mode is active (persisted)
+  asset.ts              # basePath-aware asset URLs
+  ModeContext.tsx       # active mode (persisted to localStorage)
 ```
 
 ---
 
 ## Scripts
 
-| Command            | What it does                              |
-| ------------------ | ----------------------------------------- |
-| `pnpm dev`         | Dev server at localhost:3000              |
-| `pnpm build`       | Static export to `./out`                  |
-| `pnpm deploy:docs` | Build + copy to `./docs` for GitHub Pages |
-| `pnpm lint`        | Next.js / ESLint                          |
+| Command       | What it does                 |
+| ------------- | ---------------------------- |
+| `pnpm dev`    | Dev server at localhost:3000 |
+| `pnpm build`  | Static export to `./out`     |
+| `pnpm lint`   | Next.js / ESLint             |
