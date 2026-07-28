@@ -179,44 +179,47 @@ export const projects: Project[] = [
     category: "personal",
     year: "2026",
     featured: true,
-    tags: ["Python", "vLLM", "Qdrant", "RAG"],
-    summary: "Self-hosted RAG that reads market news across asset classes and returns structured, typed sentiment.",
+    tags: ["Python", "RAG", "Qdrant", "Evals"],
+    summary: "A RAG pipeline where every claim must cite the passage it came from — and the system reports how often it succeeds.",
     oneLiner:
-      "A self-hosted RAG system that ingests market news across asset classes and returns structured, typed sentiment analysis downstream systems can actually consume.",
+      "Financial-news sentiment where every stated driver has to cite the retrieved passage supporting it, and the grounding rate ships in the response instead of staying an internal detail.",
     problem:
-      "Financial markets move on information velocity. I wanted a system that ingests market news across multiple asset classes in real time, retrieves the most relevant context for a query (ticker, theme), and returns structured, typed sentiment — with the model and vector infrastructure self-hosted, so there's no per-token API bleed and no data leaving the system.",
+      "Getting an LLM to emit well-formed JSON is solved — constrained decoding does it. What constrained decoding cannot do is make the JSON true. A schema can force a citations field to exist; it cannot make the IDs in it real, or make the cited passage actually support the claim attached to it. So a sentiment pipeline can be fully \"structured\" and still be confidently wrong, in a format that looks rigorous. I wanted to treat that as the engineering problem rather than a footnote.",
     whatYouBuilt:
-      "Multi-source ingestion with priority fallback per asset class, a semantic + metadata retrieval layer over Qdrant, and a self-hosted Qwen model served by vLLM on GCP Vertex AI behind an OpenAI-compatible API — every response shaped by a typed schema.",
+      "Keyless RSS ingest → relevance filtering → dedupe → chunk → embed → Qdrant → retrieval → Qwen3 via a local OpenAI-compatible runtime, with per-claim citations enforced by a schema rebuilt for every request, a grounding check on each cited passage, and a run manifest that reproduces any answer. Plus an eval harness with a FinBERT baseline, a hand-labelled set scored for inter-annotator agreement, and a committed scorecard.",
     keyDecisions:
-      "Multi-source priority ordering for resilience; semantic + metadata filtering so finance queries aren't just top-k; vLLM for production batching; separate chunk types so reports and article content route to the right context.",
+      "Rebuild the response schema per request so the citation field is an enum of the IDs actually retrieved; refuse rather than return an ungrounded answer; hand-label the eval set because a set labelled by the model under test measures nothing; publish the scorecard including the parts that don't flatter it.",
     whatItShows:
-      "A real production-shaped applied-AI stack: multi-provider orchestration, semantic + metadata retrieval, self-hosted inference, and a clean typed API surface — on infrastructure I own outright.",
-    stack: ["Python", "vLLM", "Qdrant", "GCP Vertex AI", "Qwen", "Pydantic"],
+      "That I can build a system that knows what it doesn't know, and prove it with numbers I didn't get to choose. The measurable claim is not that it scores well — it ties a 2019 baseline — it's that every number it reports is one you can check.",
+    stack: ["Python", "Qdrant", "Qwen3", "FastAPI", "Pydantic", "Ollama / vLLM"],
     architecture: [
       {
-        head: "Multi-source ingestion",
-        body: "Prioritized feeds per asset class — stocks via AlphaVantage → Finnhub → Marketaux → NewsAPI; crypto via AlphaVantage → CryptoRSS → Marketaux; forex via an Investing.com scraper + RSS; bonds/commodities via YahooFinance. Every article is full-text enriched asynchronously.",
+        head: "Keyless ingest",
+        body: "Every source is a keyless RSS feed, so the project runs from a clean clone with no credentials. Articles are relevance-filtered, deduped, chunked and embedded with BGE-small. A scheduled canary tells me when a feed's shape changes.",
       },
       {
-        head: "Retrieval layer",
-        body: "Semantic search (cosine similarity on embeddings) with metadata filtering on instrument / asset_class / custom filters, plus a configurable score threshold (default 0.7).",
+        head: "Citations the model cannot invent",
+        body: "Each retrieved passage enters the prompt with a short ID, and the response schema is rebuilt per request with those IDs as an enum on the citation field. A static schema can only say \"a list of strings\" — it cannot say which strings. A validator still rejects unretrieved citations, because constrained decoding is a claim made by whichever server answers.",
       },
       {
-        head: "Inference",
-        body: "vLLM serving a self-hosted Qwen model on GCP Vertex AI, wrapped in an OpenAI-compatible API so the rest of the stack stays vendor-neutral.",
+        head: "Grounding, then refusal",
+        body: "A second pass scores whether each cited passage actually supports its claim. Failures get one bounded repair attempt and then a hard error — an ungrounded answer is never returned quietly, and the grounding rate is printed alongside the verdict.",
       },
       {
-        head: "Typed outputs",
-        body: "Four response schemas (SentimentResult, ArticleData, AnalysisResponse, ChatResponse) so every response is a contract, not prose.",
+        head: "Evaluation that can embarrass me",
+        body: "A hand-labelled set, a FinBERT baseline, and a committed scorecard regenerated by make eval so a regression appears in a diff. Two annotators labelled the set independently; Cohen's κ is reported so a reader can judge the labels, not just the score.",
       },
     ],
     decisions: [
-      "Multi-source with priority ordering — if AlphaVantage is down, fall back to Finnhub. No brittle single point of failure.",
-      "Semantic + metadata filtering — constrained by relevance and instrument/timeframe, not just top-k. Finances don't tolerate \"close enough.\"",
-      "vLLM for serving — production-grade throughput and batching, chosen for auto-batch and a LoRA-capable serving layer.",
-      "Chunk-type distinction — reports and article content stored separately so a query routes to the right context.",
+      "Per-request citation enum — not belt-and-braces. With it removed, the same model on the same corpus emitted zero valid citation IDs, filling the field with paraphrased quotes while the prompt named C1…C8 explicitly.",
+      "Keyless by construction — a portfolio project that needs four paid credentials to start is a project nobody ever runs.",
+      "Hand-labelled evals — an eval set labelled by the model under test measures agreement with that model, which is not a measurement of anything.",
+      "Publish the unflattering number — fixing a mislabelled rule raised inter-annotator κ from 0.31 to 0.65 and erased a 9-point win over the FinBERT baseline. The lower number is the first one worth publishing.",
     ],
-    links: [{ label: "GitHub", href: "https://github.com/ArjunChavan219" }],
+    links: [
+      { label: "GitHub", href: "https://github.com/ArjunChavan219/market-sentiment-rag" },
+      { label: "Scorecard", href: "https://github.com/ArjunChavan219/market-sentiment-rag/blob/main/evals/scorecard.md" },
+    ],
   },
   {
     id: "librechat-coursetools",
@@ -536,13 +539,13 @@ export const origin = {
       title: "What I build when nobody's asking",
       paragraphs: [
         "The tell, if you want one, is what gets built on weekends. It is almost always a tool for a problem I actually have, which is why the small ones get finished.",
-        "An expense-splitting app on a Raspberry Pi 4 — React, Flask, PostgreSQL, self-hosted behind Route 53 and CloudFront — built specifically to own every layer from the hardware to the domain. A GRE vocabulary desktop app in Python because drilling vocabulary needed to be frictionless. Market Sentiment RAG: multi-source market-news ingestion, semantic and metadata retrieval over Qdrant, and a self-hosted Qwen model served by vLLM behind an OpenAI-compatible API, so there's no per-token bleed and nothing leaves the system.",
+        "An expense-splitting app on a Raspberry Pi 4 — React, Flask, PostgreSQL, self-hosted behind Route 53 and CloudFront — built specifically to own every layer from the hardware to the domain. A GRE vocabulary desktop app in Python because drilling vocabulary needed to be frictionless. Market Sentiment RAG, which is open source: a financial-news pipeline where every stated driver has to cite the passage it came from, with the grounding rate reported in the answer and a committed scorecard that publishes the numbers that don't flatter it.",
         "And tailchute, which is open source: a small service that lets me paste a screenshot straight into a Claude Code session running on another machine over Tailscale. It exists because macOS puts screenshots on the clipboard, Taildrop can only send files, and I hit that wall every single day.",
       ],
       bullets: [
         "Expense splitter — self-hosted on a Raspberry Pi 4 with real cloud DNS/CDN.",
         "GRE vocabulary GUI — Python/Tkinter, built to remove friction from my own studying.",
-        "Market Sentiment RAG — self-hosted vLLM + Qdrant, typed sentiment output.",
+        "Market Sentiment RAG — open source; enforced per-claim citations, grounding rate reported, scorecard committed.",
         "tailchute — open source; paste screenshots into a remote Claude Code session over Tailscale.",
       ],
     },
